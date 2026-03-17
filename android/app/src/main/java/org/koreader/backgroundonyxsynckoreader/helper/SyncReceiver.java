@@ -5,6 +5,7 @@ import static org.koreader.backgroundonyxsynckoreader.helper.PageTurnReceiver.sD
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,11 +14,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.koreader.backgroundonyxsynckoreader.contentprovider.OnyxMetatadaContentProvider;
 import org.koreader.backgroundonyxsynckoreader.contentprovider.OnyxStatisticsContentProvider;
+
+import com.onyx.android.sdk.api.device.screensaver.ScreenResourceManager;
 
 public class SyncReceiver extends BroadcastReceiver {
     private static final String TAG = "SyncReceiver";
@@ -123,6 +127,13 @@ public class SyncReceiver extends BroadcastReceiver {
             } else if (status == 1) {
                 OnyxStatisticsContentProvider
                         .insertBookOpened(applicationContext, title, path, timestamp);
+
+                // Trigger an update to the device's power-off image.
+                String coverPath = new File(Environment.getExternalStorageDirectory(), "Pictures/cover.png").getAbsolutePath();
+                boolean success = ScreenResourceManager.setShutdown(applicationContext, coverPath, false);
+                if (!success) {
+                    Log.w(TAG, "Set power off screen failed");
+                }
             }
             Log.i(TAG, "Single sync " + path + " -> " + (ok ? "OK" : "FAIL"));
         } catch (Exception e) {

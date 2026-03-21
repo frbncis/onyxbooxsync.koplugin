@@ -135,6 +135,8 @@ public class SyncReceiver extends BroadcastReceiver {
                     Log.w(TAG, "Set power off screen failed");
                 }
             }
+            // Force refresh of onyx widget
+            applicationContext.sendBroadcast(new Intent("com.onyx.statisticswidget.action.UPDATE"));
             Log.i(TAG, "Single sync " + path + " -> " + (ok ? "OK" : "FAIL"));
         } catch (Exception e) {
             Log.e(TAG, "Error in single sync", e);
@@ -194,6 +196,8 @@ public class SyncReceiver extends BroadcastReceiver {
                     .forEach(book -> OnyxStatisticsContentProvider
                             .insertBookOpened(applicationContext, book.title, book.path, book.timestamp));
 
+            // Force refresh of onyx widget
+            applicationContext.sendBroadcast(new Intent("com.onyx.statisticswidget.action.UPDATE"));
             Log.i(TAG, "Bulk sync updated " + updated + " of " + books.size() + " books");
         } catch (
                 Exception e) {
